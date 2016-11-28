@@ -1,9 +1,16 @@
 
 
-Vagrant
-VirtualBox
-MSYS2
+# 使ってるソフト
 
+* Vagrant
+* VirtualBox
+* MSYS2
+
+# Vagrantで使ってるプラグイン
+
+* vagrant-vbguest
+
+# 使用例
 
 ```bash
 cd workspace
@@ -26,12 +33,12 @@ curl -LO 'http://ww1.microchip.com/downloads/en/DeviceDoc/xc8-v1.34-part-support
 curl -LO 'https://github.com/Manouchehri/Microchip-C18-Lite/raw/master/mplabc18-v3.47-linux-lite-installer.run'
 curl -o 'harmony_v2_01b_linux_installer.run' -L 'https://www.microchip.com/mymicrochip/filehandler.aspx?ddocname=en588384'
 curl -LO 'http://ww1.microchip.com/downloads/en/softwarelibrary/mla_v2016_11_07_linux_installer.run'
-curl -LO 'https://github.com/bto-machida/vagrant_mplab/raw/checksums.md5'
+curl -LO 'https://github.com/bto-machida/vagrant_mplab/raw/master/checksums.md5'
 md5sum --check checksums.md5
 cd ..
 mkdir -p mplab
 cd mplab
-curl -LO 'https://github.com/bto-machida/vagrant_mplab/raw/bootstrap.sh'
+curl -LO 'https://github.com/bto-machida/vagrant_mplab/raw/master/bootstrap.sh'
 /bin/bash ./bootstrap.sh 2>&1 | tee bootstrap-$(date +%Y%m%d%H%M%S).log
 vagrant snapshot restore initial
 /bin/bash ./scripts/build_mla_cdc_basic.sh 2>&1 | tee build_mla_cdc_basic-\$(date +%Y%m%d%H%M%S).log
