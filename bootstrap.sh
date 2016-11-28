@@ -68,6 +68,11 @@ grep -q "LABEL=/opt" /etc/fstab || {
   #mkdir -p /opt
   echo "LABEL=/opt /opt ext4 defaults 0 0" >> /etc/fstab
   mount /opt
+  mkdir -p /opt/microchip
+}
+grep -q "/home/ubuntu/workspace/microchip" /etc/fstab || {
+  sudo -u ubuntu -g ubuntu mkdir -p /home/ubuntu/workspace/{microchip,.microchip_upper,.microchip_work}
+  echo "overlay /home/ubuntu/workspace/microchip overlay noauto,x-systemd.automount,lowerdir=/opt/microchip,upperdir=/home/ubuntu/workspace/.microchip_upper,workdir=/home/ubuntu/workspace/.microchip_work 0 0" >> /etc/fstab
 }
 ===setup_vm.sh===
 
@@ -297,7 +302,7 @@ test -e scripts/build_mla_cdc_basic.sh || cat >scripts/build_mla_cdc_basic.sh <<
 
 set -euo pipefail
 
-vagrant ssh <<EOF
+vagrant ssh -- bash <<EOF
 set -euo pipefail
 
 mount | grep -q "\\\${HOME}/workspace/microchip" || {
@@ -305,10 +310,12 @@ mount | grep -q "\\\${HOME}/workspace/microchip" || {
      sudo mount -t overlay -o lowerdir=/opt/microchip,upperdir=\\\${HOME}/workspace/.microchip_upper,workdir=\\\${HOME}/workspace/.microchip_work overlay \\\${HOME}/workspace/microchip
 }
 
-prjdir=~/workspace/microchip/mla/v2016_11_07/apps/usb/device/cdc_basic/firmware/low_pin_count_usb_development_kit_pic18f14k50.x
+prjdirX=~/workspace/microchip/mla/v2016_11_07/apps/usb/device/cdc_basic/firmware/low_pin_count_usb_development_kit_pic18f14k50.x
+prjdir="\\\${prjdirX}/../.."
 
 test \\\$(stat -c '%u' "\\\${prjdir}") -eq \\\$(id -u) || sudo chown --recursive "\\\$(id -un)" "\\\${prjdir}"
-cd "\\\${prjdir}"
+test -w "\\\${prjdir}" || sudo chmod --recursive "u+w" "\\\${prjdir}"
+cd "\\\${prjdirX}"
 rm -fr dist build
 prjMakefilesGenerator "\\\$(pwd)"
 make -f "nbproject/Makefile-LPCUSBDK_18F14K50.mk" SUBPROJECTS= clean
@@ -328,7 +335,7 @@ test -e scripts/build_harmony_cdc_msd_basic.sh || cat >scripts/build_harmony_cdc
 
 set -euo pipefail
 
-vagrant ssh <<EOF
+vagrant ssh -- bash <<EOF
 set -euo pipefail
 
 mount | grep -q "\\\${HOME}/workspace/microchip" || {
@@ -336,10 +343,12 @@ mount | grep -q "\\\${HOME}/workspace/microchip" || {
      sudo mount -t overlay -o lowerdir=/opt/microchip,upperdir=\\\${HOME}/workspace/.microchip_upper,workdir=\\\${HOME}/workspace/.microchip_work overlay \\\${HOME}/workspace/microchip
 }
 
-prjdir=~/workspace/microchip/harmony/v2_01b/apps/usb/device/cdc_msd_basic/firmware/cdc_msd_basic.X
+prjdirX=~/workspace/microchip/harmony/v2_01b/apps/usb/device/cdc_msd_basic/firmware/cdc_msd_basic.X
+prjdir="\\\${prjdir}/../.."
 
 test \\\$(stat -c '%u' "\\\${prjdir}") -eq \\\$(id -u) || sudo chown --recursive "\\\$(id -un)" "\\\${prjdir}"
-cd "\\\${prjdir}"
+test -w "\\\${prjdir}" || sudo chmod --recursive "u+w" "\\\${prjdir}"
+cd "\\\${prjdirX}"
 rm -fr dist build
 prjMakefilesGenerator "\\\$(pwd)"
 make -f "nbproject/Makefile-pic32mx_usb_sk2_int_dyn.mk" SUBPROJECTS= clean

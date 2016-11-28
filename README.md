@@ -1,21 +1,38 @@
+# vagrant_mplab/bootstrap.sh
 
+PICマイコンの開発環境を用意するスクリプト。
+VirtualBox使います。
 
-# 使ってるソフト
+## ホスト
+
+* Windows
+
+## ゲスト
+
+* Linux
+
+## 使ってるソフト
 
 * Vagrant
 * VirtualBox
 * MSYS2
+* VcXsrv
 
-# Vagrantで使ってるプラグイン
+## Vagrantで使ってるプラグイン
 
 * vagrant-vbguest
 
-# 使用例
+## Vagrantで使ってるBOX
+
+* ubuntu/xenial32
+
+## 使い方
 
 ```bash
 cd workspace
 mkdir -p vagrant
 cd vagrant
+
 mkdir -p Downloads
 cd Downloads
 curl -LO 'http://ww1.microchip.com/downloads/en/DeviceDoc/MPLABX-v3.45-linux-installer.tar'
@@ -36,12 +53,25 @@ curl -LO 'http://ww1.microchip.com/downloads/en/softwarelibrary/mla_v2016_11_07_
 curl -LO 'https://github.com/bto-machida/vagrant_mplab/raw/master/checksums.md5'
 md5sum --check checksums.md5
 cd ..
+
 mkdir -p mplab
 cd mplab
 curl -LO 'https://github.com/bto-machida/vagrant_mplab/raw/master/bootstrap.sh'
 /bin/bash ./bootstrap.sh 2>&1 | tee bootstrap-$(date +%Y%m%d%H%M%S).log
-vagrant snapshot restore initial
-/bin/bash ./scripts/build_mla_cdc_basic.sh 2>&1 | tee build_mla_cdc_basic-\$(date +%Y%m%d%H%M%S).log
-/bin/bash ./scripts/build_harmony_cdc_msd_basic.sh 2>&1 | tee build_harmony_cdc_msd_basic-\$(date +%Y%m%d%H%M%S).log
+
+vagrant up #or# vagrant snapshot restore initial
+
+/bin/bash ./scripts/build_mla_cdc_basic.sh 2>&1 | tee build_mla_cdc_basic-$(date +%Y%m%d%H%M%S).log
+
+/bin/bash ./scripts/build_harmony_cdc_msd_basic.sh 2>&1 | tee build_harmony_cdc_msd_basic-$(date +%Y%m%d%H%M%S).log
+
 DISPLAY=127.0.0.1:0.0 vagrant ssh -- mplab_ide
+
+DISPLAY=127.0.0.1:0.0 vagrant ssh -- '{
+  prjdirX=~/workspace/microchip/harmony/v2_01b/apps/usb/host/cdc_basic/firmware/cdc_basic.X
+  prjdir="${prjdirX}/../.."
+  test $(stat -c "%u" "${prjdir}") -eq $(id -u) || sudo chown --recursive "$(id -un)" "${prjdir}"
+  test -w "${prjdir}" || chmod --recursive "u+w" "${prjdir}"
+  mplab_ide "${prjdirX}"
+}'
 ```
