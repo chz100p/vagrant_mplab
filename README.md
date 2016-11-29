@@ -1,7 +1,10 @@
 # vagrant_mplab/bootstrap.sh
 
 PICマイコンの開発環境を用意するスクリプト。
-VirtualBox使います。
+
+Vagrant、VirtualBox、作業にMSYS2のbashを使っています。
+
+もろもろ環境に合わせて修正して使ってください。
 
 ## ホスト
 
